@@ -1,35 +1,36 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { IconMic, IconWaveform, IconCpu, IconTerminal, IconSpeaker } from './Icons';
 
 const steps = [
   {
     num: '01',
-    icon: '🎙️',
+    icon: <IconMic size={24} />,
     title: 'Wake Word',
     desc: 'Say "Hey Lumi" to activate',
   },
   {
     num: '02',
-    icon: '🔊',
+    icon: <IconWaveform size={24} />,
     title: 'Whisper STT',
     desc: 'GPU-accelerated speech recognition',
   },
   {
     num: '03',
-    icon: '🧠',
+    icon: <IconCpu size={24} />,
     title: 'Nemotron LLM',
     desc: 'Local language model reasoning',
   },
   {
     num: '04',
-    icon: '⚙️',
+    icon: <IconTerminal size={24} />,
     title: 'Action Executor',
     desc: 'System-level command execution',
   },
   {
     num: '05',
-    icon: '🔈',
+    icon: <IconSpeaker size={24} />,
     title: 'Piper TTS',
     desc: 'Natural voice synthesis response',
   },
@@ -39,19 +40,20 @@ const containerVariants = {
   hidden: {},
   visible: {
     transition: {
-      staggerChildren: 0.12,
+      staggerChildren: 0.1,
     },
   },
 };
 
 const stepVariants = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 20, filter: 'blur(6px)' },
   visible: {
     opacity: 1,
     y: 0,
+    filter: 'blur(0px)',
     transition: {
-      duration: 0.6,
-      ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+      duration: 0.5,
+      ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number],
     },
   },
 };
@@ -61,17 +63,17 @@ export default function HowItWorks() {
     <section className="section how-it-works" id="how-it-works">
       <div className="container">
         <motion.div
-          className="how-it-works__header"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.7 }}
+          className="section-header"
+          initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
+          whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.6 }}
         >
-          <p className="how-it-works__label">The Loop</p>
-          <h2 className="how-it-works__title">
+          <span className="section-label" style={{ color: 'var(--color-purple)' }}>The Loop</span>
+          <h2 className="section-title">
             From voice to <span className="gradient-text">action</span>
           </h2>
-          <p className="how-it-works__subtitle">
+          <p className="section-subtitle">
             A complete pipeline running locally on your GPU — from wake word
             detection to voice response in milliseconds.
           </p>
@@ -82,9 +84,8 @@ export default function HowItWorks() {
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
+          viewport={{ once: true, margin: '-60px' }}
         >
-          {/* Connector line */}
           <div className="pipeline__connector">
             <div className="pipeline__connector-glow" />
           </div>

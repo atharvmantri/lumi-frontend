@@ -2,6 +2,8 @@
 
 import { motion } from 'framer-motion';
 
+const CURRENT_YEAR = 2026;
+
 export default function Footer() {
   return (
     <motion.footer
@@ -9,7 +11,7 @@ export default function Footer() {
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.6 }}
+      transition={{ duration: 0.5 }}
     >
       <div className="container">
         <div className="footer__inner">
@@ -19,7 +21,7 @@ export default function Footer() {
           </div>
 
           <p className="footer__copy">
-            &copy; {new Date().getFullYear()} Lumi. All rights reserved.
+            &copy; {CURRENT_YEAR} Lumi. All rights reserved.
           </p>
 
           <ul className="footer__links">

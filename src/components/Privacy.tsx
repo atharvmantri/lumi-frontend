@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { IconShield, IconCheck } from './Icons';
 
 const privacyFeatures = [
   'Zero cloud dependency',
@@ -15,19 +16,19 @@ export default function Privacy() {
       <div className="container">
         <motion.div
           className="privacy__card"
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+          whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
         >
           <motion.div
             className="privacy__icon"
-            initial={{ scale: 0 }}
-            whileInView={{ scale: 1 }}
+            initial={{ scale: 0, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3, type: 'spring', stiffness: 200 }}
+            transition={{ duration: 0.5, delay: 0.2, type: 'spring', stiffness: 200, damping: 15 }}
           >
-            🛡️
+            <IconShield size={40} />
           </motion.div>
 
           <h2 className="privacy__title">
@@ -41,21 +42,23 @@ export default function Privacy() {
 
           <motion.div
             className="privacy__features"
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.5 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
           >
             {privacyFeatures.map((feature, i) => (
               <motion.div
                 key={i}
                 className="privacy__feature"
-                initial={{ opacity: 0, x: -10 }}
+                initial={{ opacity: 0, x: -8 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: 0.6 + i * 0.1 }}
+                transition={{ duration: 0.3, delay: 0.5 + i * 0.08 }}
               >
-                <span className="privacy__feature-check">✓</span>
+                <span className="privacy__feature-check">
+                  <IconCheck size={10} />
+                </span>
                 {feature}
               </motion.div>
             ))}
