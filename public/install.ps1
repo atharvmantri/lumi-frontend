@@ -331,7 +331,7 @@ if ($mode -eq "2") {
         "Custom Provider"
     )
     $providerDescs = @(
-        "Free tier. No API key needed",
+        "HackClub AI Proxy (Requires HackClub API key)",
         "One key, access all major models",
         "GPT-5.5, GPT-5.4, GPT-4.1, and more",
         "Claude Opus 4.8, Sonnet 4.6, Haiku 4.5",
@@ -372,13 +372,11 @@ if ($mode -eq "2") {
     }
     
     # ── API Key ──
-    if ($llmProvider -ne "hackclub") {
-        Write-Host ""
-        Write-Host "  Enter your API key:" -ForegroundColor $c.Heading
-        Write-Host "  This will be saved in .env and never transmitted anywhere." -ForegroundColor $c.Muted
-        Write-Host ""
-        $apiKeyValue = Read-Host "    API key (or press Enter to set up later)"
-    }
+    Write-Host ""
+    Write-Host "  Enter your API key for $($providerLabels[$provIdx]):" -ForegroundColor $c.Heading
+    Write-Host "  This will be saved in .env and never transmitted anywhere." -ForegroundColor $c.Muted
+    Write-Host ""
+    $apiKeyValue = Read-Host "    API key (or press Enter to set up later)"
 
     # ── TTS Voice ──
     Draw-Divider
