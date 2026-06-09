@@ -1,29 +1,93 @@
 {
+  "ollama": {
+    "label": "Ollama (Local)",
+    "base_url": "http://localhost:11434/v1",
+    "api_key_env": "OLLAMA_API_KEY",
+    "groups": [
+      {
+        "name": "Popular Local Models",
+        "models": [
+          { "id": "llama3.2", "name": "Llama 3.2", "note": "Meta's efficient local model" },
+          { "id": "llama3.1", "name": "Llama 3.1", "note": "Meta's instruction-tuned model" },
+          { "id": "phi3", "name": "Phi 3", "note": "Microsoft's lightweight model" },
+          { "id": "mistral", "name": "Mistral", "note": "Strong 7B model" },
+          { "id": "qwen2.5", "name": "Qwen 2.5", "note": "Alibaba's powerful local model" },
+          { "id": "gemma2", "name": "Gemma 2", "note": "Google's open model" },
+          { "id": "deepseek-r1", "name": "DeepSeek R1", "note": "Strong reasoning local model" }
+        ]
+      }
+    ]
+  },
   "hackclub": {
-    "label": "HackClub Free",
+    "label": "HackClub AI Proxy",
     "base_url": "https://ai.hackclub.com/proxy/v1",
     "api_key_env": "HACKCLUB_API_KEY",
     "groups": [
       {
-        "name": "Recommended",
+        "name": "Recommended Free",
         "models": [
-          { "id": "openrouter/free", "name": "OpenRouter Free Proxy", "note": "Default free tier" },
-          { "id": "meta-llama/llama-4-maverick", "name": "Llama 4 Maverick", "note": "Strong open model" },
-          { "id": "meta-llama/llama-4-scout", "name": "Llama 4 Scout", "note": "Fast open model" }
-        ]
-      },
-      {
-        "name": "Google",
-        "models": [
-          { "id": "google/gemini-2.5-flash", "name": "Gemini 2.5 Flash", "note": "Fast and capable" },
-          { "id": "google/gemini-2.5-pro", "name": "Gemini 2.5 Pro", "note": "Advanced reasoning" }
+          { "id": "openrouter/free", "name": "OpenRouter Free Auto", "note": "Automatically routes to best free model" },
+          { "id": "google/gemma-4-31b-it:free", "name": "Gemma 4 31B", "note": "Strong open model from Google" },
+          { "id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", "name": "Nemotron 3 Nano Omni", "note": "Fast multimodal reasoning" },
+          { "id": "poolside/laguna-xs.2:free", "name": "Laguna XS.2", "note": "Efficient coding agent" },
+          { "id": "poolside/laguna-m.1:free", "name": "Laguna M.1", "note": "Flagship coding agent" },
+          { "id": "moonshotai/kimi-k2.6:free", "name": "Kimi K2.6", "note": "Long-horizon coding" },
+          { "id": "liquid/lfm-2.5-1.2b-thinking:free", "name": "Liquid LFM 2.5 Thinking", "note": "Lightweight reasoning" }
         ]
       },
       {
         "name": "Anthropic",
         "models": [
-          { "id": "anthropic/claude-sonnet-4-6", "name": "Claude Sonnet 4.6", "note": "Speed + intelligence" },
-          { "id": "anthropic/claude-haiku-4-5", "name": "Claude Haiku 4.5", "note": "Fastest Claude" }
+          { "id": "anthropic/claude-opus-4.8", "name": "Claude Opus 4.8", "note": "Most capable generally available model" },
+          { "id": "anthropic/claude-sonnet-4.6", "name": "Claude Sonnet 4.6", "note": "Frontier performance across coding" },
+          { "id": "anthropic/claude-haiku-4.5", "name": "Claude Haiku 4.5", "note": "Fastest and most efficient" },
+          { "id": "anthropic/claude-fable-5", "name": "Claude Fable 5", "note": "Autonomous knowledge work" }
+        ]
+      },
+      {
+        "name": "OpenAI",
+        "models": [
+          { "id": "openai/gpt-5.5-pro", "name": "GPT-5.5 Pro", "note": "High-capability reasoning" },
+          { "id": "openai/gpt-5.5", "name": "GPT-5.5", "note": "Frontier model for complex work" },
+          { "id": "openai/gpt-5.4-pro", "name": "GPT-5.4 Pro", "note": "Advanced reasoning" },
+          { "id": "openai/gpt-5.4", "name": "GPT-5.4", "note": "Unified Codex and GPT" },
+          { "id": "openai/gpt-5.4-mini", "name": "GPT-5.4 Mini", "note": "Efficient high-throughput" },
+          { "id": "openai/gpt-5.3-codex", "name": "GPT-5.3 Codex", "note": "Advanced agentic coding" },
+          { "id": "openai/o3-deep-research", "name": "o3 Deep Research", "note": "Multi-step research tasks" }
+        ]
+      },
+      {
+        "name": "Google",
+        "models": [
+          { "id": "google/gemini-3.5-flash", "name": "Gemini 3.5 Flash", "note": "High-efficiency multimodal" },
+          { "id": "google/gemini-3.1-pro-preview", "name": "Gemini 3.1 Pro", "note": "Frontier reasoning" },
+          { "id": "google/gemini-3.1-flash-lite", "name": "Gemini 3.1 Flash Lite", "note": "Low-latency workloads" },
+          { "id": "google/gemini-2.5-pro", "name": "Gemini 2.5 Pro", "note": "Advanced complex tasks" },
+          { "id": "google/gemini-2.5-flash", "name": "Gemini 2.5 Flash", "note": "Price-performance leader" }
+        ]
+      },
+      {
+        "name": "DeepSeek & Qwen",
+        "models": [
+          { "id": "deepseek/deepseek-v4-pro", "name": "DeepSeek V4 Pro", "note": "1.6T MoE advanced reasoning" },
+          { "id": "deepseek/deepseek-v4-flash", "name": "DeepSeek V4 Flash", "note": "Efficiency-optimized MoE" },
+          { "id": "deepseek/deepseek-v3.2", "name": "DeepSeek V3.2", "note": "Strong reasoning & agentic" },
+          { "id": "qwen/qwen3.7-max", "name": "Qwen 3.7 Max", "note": "Flagship agent-centric model" },
+          { "id": "qwen/qwen3.7-plus", "name": "Qwen 3.7 Plus", "note": "Cost-effective multimodal" },
+          { "id": "qwen/qwen3-coder-plus", "name": "Qwen 3 Coder Plus", "note": "Powerful coding agent" }
+        ]
+      },
+      {
+        "name": "X.AI, Mistral & Others",
+        "models": [
+          { "id": "x-ai/grok-4.20", "name": "Grok 4.20", "note": "Industry-leading speed" },
+          { "id": "x-ai/grok-build-0.1", "name": "Grok Build 0.1", "note": "Fast coding workflows" },
+          { "id": "mistralai/mistral-large-2512", "name": "Mistral Large 3", "note": "Most capable Mistral" },
+          { "id": "mistralai/mistral-medium-3-5", "name": "Mistral Medium 3.5", "note": "128B instruction-following" },
+          { "id": "mistralai/devstral-2512", "name": "Devstral 2", "note": "Agentic coding specialist" },
+          { "id": "openrouter/fusion", "name": "Fusion", "note": "Multi-model deliberation" },
+          { "id": "openrouter/pareto-code", "name": "Pareto Code Router", "note": "Routes to strongest coding model" },
+          { "id": "openrouter/owl-alpha", "name": "Owl Alpha", "note": "Agentic workloads" }
         ]
       }
     ]
@@ -34,46 +98,70 @@
     "api_key_env": "OPENROUTER_API_KEY",
     "groups": [
       {
-        "name": "OpenAI",
+        "name": "Recommended Free",
         "models": [
-          { "id": "openai/gpt-5.5", "name": "GPT-5.5", "note": "Latest frontier" },
-          { "id": "openai/gpt-5.4", "name": "GPT-5.4", "note": "Affordable frontier" },
-          { "id": "openai/gpt-5.4-mini", "name": "GPT-5.4 Mini", "note": "Fast and cheap" },
-          { "id": "openai/gpt-5.4-nano", "name": "GPT-5.4 Nano", "note": "Cheapest" },
-          { "id": "openai/gpt-4.1", "name": "GPT-4.1", "note": "Smartest non-reasoning" },
-          { "id": "openai/gpt-4.1-mini", "name": "GPT-4.1 Mini", "note": "Fast non-reasoning" }
+          { "id": "openrouter/free", "name": "OpenRouter Free Auto", "note": "Automatically routes to best free model" },
+          { "id": "google/gemma-4-31b-it:free", "name": "Gemma 4 31B", "note": "Strong open model from Google" },
+          { "id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", "name": "Nemotron 3 Nano Omni", "note": "Fast multimodal reasoning" },
+          { "id": "poolside/laguna-xs.2:free", "name": "Laguna XS.2", "note": "Efficient coding agent" },
+          { "id": "poolside/laguna-m.1:free", "name": "Laguna M.1", "note": "Flagship coding agent" },
+          { "id": "moonshotai/kimi-k2.6:free", "name": "Kimi K2.6", "note": "Long-horizon coding" },
+          { "id": "liquid/lfm-2.5-1.2b-thinking:free", "name": "Liquid LFM 2.5 Thinking", "note": "Lightweight reasoning" }
         ]
       },
       {
         "name": "Anthropic",
         "models": [
-          { "id": "anthropic/claude-opus-4-8", "name": "Claude Opus 4.8", "note": "Most capable" },
-          { "id": "anthropic/claude-sonnet-4-6", "name": "Claude Sonnet 4.6", "note": "Speed + intelligence" },
-          { "id": "anthropic/claude-haiku-4-5", "name": "Claude Haiku 4.5", "note": "Fastest" }
+          { "id": "anthropic/claude-opus-4.8", "name": "Claude Opus 4.8", "note": "Most capable generally available model" },
+          { "id": "anthropic/claude-sonnet-4.6", "name": "Claude Sonnet 4.6", "note": "Frontier performance across coding" },
+          { "id": "anthropic/claude-haiku-4.5", "name": "Claude Haiku 4.5", "note": "Fastest and most efficient" },
+          { "id": "anthropic/claude-fable-5", "name": "Claude Fable 5", "note": "Autonomous knowledge work" }
+        ]
+      },
+      {
+        "name": "OpenAI",
+        "models": [
+          { "id": "openai/gpt-5.5-pro", "name": "GPT-5.5 Pro", "note": "High-capability reasoning" },
+          { "id": "openai/gpt-5.5", "name": "GPT-5.5", "note": "Frontier model for complex work" },
+          { "id": "openai/gpt-5.4-pro", "name": "GPT-5.4 Pro", "note": "Advanced reasoning" },
+          { "id": "openai/gpt-5.4", "name": "GPT-5.4", "note": "Unified Codex and GPT" },
+          { "id": "openai/gpt-5.4-mini", "name": "GPT-5.4 Mini", "note": "Efficient high-throughput" },
+          { "id": "openai/gpt-5.3-codex", "name": "GPT-5.3 Codex", "note": "Advanced agentic coding" },
+          { "id": "openai/o3-deep-research", "name": "o3 Deep Research", "note": "Multi-step research tasks" }
         ]
       },
       {
         "name": "Google",
         "models": [
-          { "id": "google/gemini-3.5-flash", "name": "Gemini 3.5 Flash", "note": "Latest Flash" },
-          { "id": "google/gemini-3.1-pro-preview", "name": "Gemini 3.1 Pro", "note": "Advanced reasoning" },
-          { "id": "google/gemini-2.5-flash", "name": "Gemini 2.5 Flash", "note": "Stable workhorse" },
-          { "id": "google/gemini-2.5-pro", "name": "Gemini 2.5 Pro", "note": "Deep reasoning" }
+          { "id": "google/gemini-3.5-flash", "name": "Gemini 3.5 Flash", "note": "High-efficiency multimodal" },
+          { "id": "google/gemini-3.1-pro-preview", "name": "Gemini 3.1 Pro", "note": "Frontier reasoning" },
+          { "id": "google/gemini-3.1-flash-lite", "name": "Gemini 3.1 Flash Lite", "note": "Low-latency workloads" },
+          { "id": "google/gemini-2.5-pro", "name": "Gemini 2.5 Pro", "note": "Advanced complex tasks" },
+          { "id": "google/gemini-2.5-flash", "name": "Gemini 2.5 Flash", "note": "Price-performance leader" }
         ]
       },
       {
-        "name": "Meta",
+        "name": "DeepSeek & Qwen",
         "models": [
-          { "id": "meta-llama/llama-4-maverick", "name": "Llama 4 Maverick", "note": "Strong open model" },
-          { "id": "meta-llama/llama-4-scout", "name": "Llama 4 Scout", "note": "Fast open model" }
+          { "id": "deepseek/deepseek-v4-pro", "name": "DeepSeek V4 Pro", "note": "1.6T MoE advanced reasoning" },
+          { "id": "deepseek/deepseek-v4-flash", "name": "DeepSeek V4 Flash", "note": "Efficiency-optimized MoE" },
+          { "id": "deepseek/deepseek-v3.2", "name": "DeepSeek V3.2", "note": "Strong reasoning & agentic" },
+          { "id": "qwen/qwen3.7-max", "name": "Qwen 3.7 Max", "note": "Flagship agent-centric model" },
+          { "id": "qwen/qwen3.7-plus", "name": "Qwen 3.7 Plus", "note": "Cost-effective multimodal" },
+          { "id": "qwen/qwen3-coder-plus", "name": "Qwen 3 Coder Plus", "note": "Powerful coding agent" }
         ]
       },
       {
-        "name": "Open-Weight",
+        "name": "X.AI, Mistral & Others",
         "models": [
-          { "id": "mistralai/mistral-large-latest", "name": "Mistral Large", "note": "Top Mistral model" },
-          { "id": "deepseek/deepseek-r1", "name": "DeepSeek R1", "note": "Strong reasoning" },
-          { "id": "qwen/qwen-3-235b", "name": "Qwen 3 235B", "note": "Large Chinese model" }
+          { "id": "x-ai/grok-4.20", "name": "Grok 4.20", "note": "Industry-leading speed" },
+          { "id": "x-ai/grok-build-0.1", "name": "Grok Build 0.1", "note": "Fast coding workflows" },
+          { "id": "mistralai/mistral-large-2512", "name": "Mistral Large 3", "note": "Most capable Mistral" },
+          { "id": "mistralai/mistral-medium-3-5", "name": "Mistral Medium 3.5", "note": "128B instruction-following" },
+          { "id": "mistralai/devstral-2512", "name": "Devstral 2", "note": "Agentic coding specialist" },
+          { "id": "openrouter/fusion", "name": "Fusion", "note": "Multi-model deliberation" },
+          { "id": "openrouter/pareto-code", "name": "Pareto Code Router", "note": "Routes to strongest coding model" },
+          { "id": "openrouter/owl-alpha", "name": "Owl Alpha", "note": "Agentic workloads" }
         ]
       }
     ]
@@ -84,7 +172,7 @@
     "api_key_env": "OPENAI_API_KEY",
     "groups": [
       {
-        "name": "Frontier",
+        "name": "Frontier Models",
         "models": [
           { "id": "gpt-5.5", "name": "GPT-5.5", "note": "Latest frontier intelligence" },
           { "id": "gpt-5.5-pro", "name": "GPT-5.5 Pro", "note": "Smarter, more precise" },
@@ -95,15 +183,30 @@
         ]
       },
       {
+        "name": "Reasoning & Agentic",
+        "models": [
+          { "id": "o3", "name": "o3", "note": "Reasoning model for complex tasks" },
+          { "id": "o3-pro", "name": "o3 Pro", "note": "More compute for better responses" },
+          { "id": "o3-deep-research", "name": "o3 Deep Research", "note": "Deep research model" },
+          { "id": "gpt-5.3-codex", "name": "GPT-5.3 Codex", "note": "Most capable agentic coding model" },
+          { "id": "gpt-5.2-codex", "name": "GPT-5.2 Codex", "note": "Software engineering workflows" }
+        ]
+      },
+      {
+        "name": "Realtime & Audio",
+        "models": [
+          { "id": "gpt-realtime-2", "name": "GPT-Realtime-2", "note": "Reasoning model for realtime voice" },
+          { "id": "gpt-realtime-1.5", "name": "GPT-Realtime-1.5", "note": "Best voice model for audio in/out" },
+          { "id": "gpt-audio", "name": "GPT Audio", "note": "Audio inputs/outputs with Chat Completions" }
+        ]
+      },
+      {
         "name": "Previous Generation",
         "models": [
-          { "id": "gpt-5.3-codex", "name": "GPT-5.3 Codex", "note": "Agentic coding" },
           { "id": "gpt-5.2", "name": "GPT-5.2", "note": "Configurable reasoning" },
           { "id": "gpt-5.1", "name": "GPT-5.1", "note": "Coding and agentic tasks" },
           { "id": "gpt-5", "name": "GPT-5", "note": "Reasoning model" },
-          { "id": "gpt-5-mini", "name": "GPT-5 Mini", "note": "Cost-efficient frontier" },
           { "id": "gpt-4.1", "name": "GPT-4.1", "note": "Smartest non-reasoning" },
-          { "id": "gpt-4.1-mini", "name": "GPT-4.1 Mini", "note": "Smaller, faster" },
           { "id": "gpt-4o-mini", "name": "GPT-4o Mini", "note": "Fast, affordable" }
         ]
       }
@@ -115,7 +218,7 @@
     "api_key_env": "ANTHROPIC_API_KEY",
     "groups": [
       {
-        "name": "Latest",
+        "name": "Latest Generation",
         "models": [
           { "id": "claude-opus-4-8", "name": "Claude Opus 4.8", "note": "Most capable, complex reasoning" },
           { "id": "claude-sonnet-4-6", "name": "Claude Sonnet 4.6", "note": "Best speed + intelligence" },
@@ -123,7 +226,7 @@
         ]
       },
       {
-        "name": "Legacy",
+        "name": "Previous Generation",
         "models": [
           { "id": "claude-opus-4-7", "name": "Claude Opus 4.7", "note": "Previous flagship" },
           { "id": "claude-opus-4-6", "name": "Claude Opus 4.6", "note": "Extended thinking" },
@@ -141,7 +244,7 @@
         "name": "Gemini 3",
         "models": [
           { "id": "gemini-3.5-flash", "name": "Gemini 3.5 Flash", "note": "Sustained frontier performance" },
-          { "id": "gemini-3.1-pro-preview", "name": "Gemini 3.1 Pro", "note": "Advanced, preview" },
+          { "id": "gemini-3.1-pro-preview", "name": "Gemini 3.1 Pro", "note": "Advanced intelligence" },
           { "id": "gemini-3-flash-preview", "name": "Gemini 3 Flash", "note": "Frontier-class, preview" },
           { "id": "gemini-3.1-flash-lite", "name": "Gemini 3.1 Flash-Lite", "note": "Most cost-efficient" }
         ]
@@ -152,6 +255,15 @@
           { "id": "gemini-2.5-pro", "name": "Gemini 2.5 Pro", "note": "Deep reasoning and coding" },
           { "id": "gemini-2.5-flash", "name": "Gemini 2.5 Flash", "note": "Price-performance leader" },
           { "id": "gemini-2.5-flash-lite", "name": "Gemini 2.5 Flash-Lite", "note": "Budget-friendly" }
+        ]
+      },
+      {
+        "name": "Specialized & Audio",
+        "models": [
+          { "id": "gemini-3.1-flash-live-preview", "name": "Gemini 3.1 Flash Live", "note": "Real-time dialogue" },
+          { "id": "gemini-2.5-flash-native-audio-preview-12-2025", "name": "Gemini 2.5 Flash Live", "note": "Voice and video agents" },
+          { "id": "antigravity-preview-05-2026", "name": "Antigravity Agent", "note": "General-purpose managed agent" },
+          { "id": "deep-research-preview-04-2026", "name": "Deep Research", "note": "Autonomous research" }
         ]
       }
     ]

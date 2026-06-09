@@ -321,13 +321,14 @@ if ($mode -eq "2") {
 
     # ── LLM Provider ──
     Draw-Divider
-    $providerKeys  = @("hackclub", "openrouter", "openai", "anthropic", "google", "custom")
+    $providerKeys  = @("hackclub", "openrouter", "openai", "anthropic", "google", "ollama", "custom")
     $providerLabels = @(
         "HackClub Free",
         "OpenRouter",
         "OpenAI Direct",
         "Anthropic Direct",
         "Google AI Direct",
+        "Ollama (Local)",
         "Custom Provider"
     )
     $providerDescs = @(
@@ -336,6 +337,7 @@ if ($mode -eq "2") {
         "GPT-5.5, GPT-5.4, GPT-4.1, and more",
         "Claude Opus 4.8, Sonnet 4.6, Haiku 4.5",
         "Gemini 3.5 Flash, 2.5 Pro, and more",
+        "Run models locally on your own machine",
         "Bring your own endpoint and API key"
     )
     
@@ -372,11 +374,15 @@ if ($mode -eq "2") {
     }
     
     # ── API Key ──
-    Write-Host ""
-    Write-Host "  Enter your API key for $($providerLabels[$provIdx]):" -ForegroundColor $c.Heading
-    Write-Host "  This will be saved in .env and never transmitted anywhere." -ForegroundColor $c.Muted
-    Write-Host ""
-    $apiKeyValue = Read-Host "    API key (or press Enter to set up later)"
+    if ($llmProvider -ne "ollama") {
+        Write-Host ""
+        Write-Host "  Enter your API key for $($providerLabels[$provIdx]):" -ForegroundColor $c.Heading
+        Write-Host "  This will be saved in .env and never transmitted anywhere." -ForegroundColor $c.Muted
+        Write-Host ""
+        $apiKeyValue = Read-Host "    API key (or press Enter to set up later)"
+    } else {
+        $apiKeyValue = "ollama"
+    }
 
     # ── TTS Voice ──
     Draw-Divider
