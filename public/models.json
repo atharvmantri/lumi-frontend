@@ -1,0 +1,165 @@
+{
+  "hackclub": {
+    "label": "HackClub Free",
+    "base_url": "https://ai.hackclub.com/proxy/v1",
+    "api_key_env": "HACKCLUB_API_KEY",
+    "groups": [
+      {
+        "name": "Recommended",
+        "models": [
+          { "id": "openrouter/free", "name": "OpenRouter Free Proxy", "note": "Default free tier" },
+          { "id": "meta-llama/llama-4-maverick", "name": "Llama 4 Maverick", "note": "Strong open model" },
+          { "id": "meta-llama/llama-4-scout", "name": "Llama 4 Scout", "note": "Fast open model" }
+        ]
+      },
+      {
+        "name": "Google",
+        "models": [
+          { "id": "google/gemini-2.5-flash", "name": "Gemini 2.5 Flash", "note": "Fast and capable" },
+          { "id": "google/gemini-2.5-pro", "name": "Gemini 2.5 Pro", "note": "Advanced reasoning" }
+        ]
+      },
+      {
+        "name": "Anthropic",
+        "models": [
+          { "id": "anthropic/claude-sonnet-4-6", "name": "Claude Sonnet 4.6", "note": "Speed + intelligence" },
+          { "id": "anthropic/claude-haiku-4-5", "name": "Claude Haiku 4.5", "note": "Fastest Claude" }
+        ]
+      }
+    ]
+  },
+  "openrouter": {
+    "label": "OpenRouter",
+    "base_url": "https://openrouter.ai/api/v1",
+    "api_key_env": "OPENROUTER_API_KEY",
+    "groups": [
+      {
+        "name": "OpenAI",
+        "models": [
+          { "id": "openai/gpt-5.5", "name": "GPT-5.5", "note": "Latest frontier" },
+          { "id": "openai/gpt-5.4", "name": "GPT-5.4", "note": "Affordable frontier" },
+          { "id": "openai/gpt-5.4-mini", "name": "GPT-5.4 Mini", "note": "Fast and cheap" },
+          { "id": "openai/gpt-5.4-nano", "name": "GPT-5.4 Nano", "note": "Cheapest" },
+          { "id": "openai/gpt-4.1", "name": "GPT-4.1", "note": "Smartest non-reasoning" },
+          { "id": "openai/gpt-4.1-mini", "name": "GPT-4.1 Mini", "note": "Fast non-reasoning" }
+        ]
+      },
+      {
+        "name": "Anthropic",
+        "models": [
+          { "id": "anthropic/claude-opus-4-8", "name": "Claude Opus 4.8", "note": "Most capable" },
+          { "id": "anthropic/claude-sonnet-4-6", "name": "Claude Sonnet 4.6", "note": "Speed + intelligence" },
+          { "id": "anthropic/claude-haiku-4-5", "name": "Claude Haiku 4.5", "note": "Fastest" }
+        ]
+      },
+      {
+        "name": "Google",
+        "models": [
+          { "id": "google/gemini-3.5-flash", "name": "Gemini 3.5 Flash", "note": "Latest Flash" },
+          { "id": "google/gemini-3.1-pro-preview", "name": "Gemini 3.1 Pro", "note": "Advanced reasoning" },
+          { "id": "google/gemini-2.5-flash", "name": "Gemini 2.5 Flash", "note": "Stable workhorse" },
+          { "id": "google/gemini-2.5-pro", "name": "Gemini 2.5 Pro", "note": "Deep reasoning" }
+        ]
+      },
+      {
+        "name": "Meta",
+        "models": [
+          { "id": "meta-llama/llama-4-maverick", "name": "Llama 4 Maverick", "note": "Strong open model" },
+          { "id": "meta-llama/llama-4-scout", "name": "Llama 4 Scout", "note": "Fast open model" }
+        ]
+      },
+      {
+        "name": "Open-Weight",
+        "models": [
+          { "id": "mistralai/mistral-large-latest", "name": "Mistral Large", "note": "Top Mistral model" },
+          { "id": "deepseek/deepseek-r1", "name": "DeepSeek R1", "note": "Strong reasoning" },
+          { "id": "qwen/qwen-3-235b", "name": "Qwen 3 235B", "note": "Large Chinese model" }
+        ]
+      }
+    ]
+  },
+  "openai": {
+    "label": "OpenAI Direct",
+    "base_url": "https://api.openai.com/v1",
+    "api_key_env": "OPENAI_API_KEY",
+    "groups": [
+      {
+        "name": "Frontier",
+        "models": [
+          { "id": "gpt-5.5", "name": "GPT-5.5", "note": "Latest frontier intelligence" },
+          { "id": "gpt-5.5-pro", "name": "GPT-5.5 Pro", "note": "Smarter, more precise" },
+          { "id": "gpt-5.4", "name": "GPT-5.4", "note": "Affordable frontier" },
+          { "id": "gpt-5.4-pro", "name": "GPT-5.4 Pro", "note": "Smarter, more precise" },
+          { "id": "gpt-5.4-mini", "name": "GPT-5.4 Mini", "note": "Strong mini model" },
+          { "id": "gpt-5.4-nano", "name": "GPT-5.4 Nano", "note": "Cheapest GPT-5.4-class" }
+        ]
+      },
+      {
+        "name": "Previous Generation",
+        "models": [
+          { "id": "gpt-5.3-codex", "name": "GPT-5.3 Codex", "note": "Agentic coding" },
+          { "id": "gpt-5.2", "name": "GPT-5.2", "note": "Configurable reasoning" },
+          { "id": "gpt-5.1", "name": "GPT-5.1", "note": "Coding and agentic tasks" },
+          { "id": "gpt-5", "name": "GPT-5", "note": "Reasoning model" },
+          { "id": "gpt-5-mini", "name": "GPT-5 Mini", "note": "Cost-efficient frontier" },
+          { "id": "gpt-4.1", "name": "GPT-4.1", "note": "Smartest non-reasoning" },
+          { "id": "gpt-4.1-mini", "name": "GPT-4.1 Mini", "note": "Smaller, faster" },
+          { "id": "gpt-4o-mini", "name": "GPT-4o Mini", "note": "Fast, affordable" }
+        ]
+      }
+    ]
+  },
+  "anthropic": {
+    "label": "Anthropic Direct",
+    "base_url": "https://api.anthropic.com/v1",
+    "api_key_env": "ANTHROPIC_API_KEY",
+    "groups": [
+      {
+        "name": "Latest",
+        "models": [
+          { "id": "claude-opus-4-8", "name": "Claude Opus 4.8", "note": "Most capable, complex reasoning" },
+          { "id": "claude-sonnet-4-6", "name": "Claude Sonnet 4.6", "note": "Best speed + intelligence" },
+          { "id": "claude-haiku-4-5", "name": "Claude Haiku 4.5", "note": "Fastest, near-frontier" }
+        ]
+      },
+      {
+        "name": "Legacy",
+        "models": [
+          { "id": "claude-opus-4-7", "name": "Claude Opus 4.7", "note": "Previous flagship" },
+          { "id": "claude-opus-4-6", "name": "Claude Opus 4.6", "note": "Extended thinking" },
+          { "id": "claude-sonnet-4-5", "name": "Claude Sonnet 4.5", "note": "Previous Sonnet" }
+        ]
+      }
+    ]
+  },
+  "google": {
+    "label": "Google AI Direct",
+    "base_url": "https://generativelanguage.googleapis.com/v1beta",
+    "api_key_env": "GOOGLE_API_KEY",
+    "groups": [
+      {
+        "name": "Gemini 3",
+        "models": [
+          { "id": "gemini-3.5-flash", "name": "Gemini 3.5 Flash", "note": "Sustained frontier performance" },
+          { "id": "gemini-3.1-pro-preview", "name": "Gemini 3.1 Pro", "note": "Advanced, preview" },
+          { "id": "gemini-3-flash-preview", "name": "Gemini 3 Flash", "note": "Frontier-class, preview" },
+          { "id": "gemini-3.1-flash-lite", "name": "Gemini 3.1 Flash-Lite", "note": "Most cost-efficient" }
+        ]
+      },
+      {
+        "name": "Gemini 2.5",
+        "models": [
+          { "id": "gemini-2.5-pro", "name": "Gemini 2.5 Pro", "note": "Deep reasoning and coding" },
+          { "id": "gemini-2.5-flash", "name": "Gemini 2.5 Flash", "note": "Price-performance leader" },
+          { "id": "gemini-2.5-flash-lite", "name": "Gemini 2.5 Flash-Lite", "note": "Budget-friendly" }
+        ]
+      }
+    ]
+  },
+  "custom": {
+    "label": "Custom Provider",
+    "base_url": "",
+    "api_key_env": "CUSTOM_API_KEY",
+    "groups": []
+  }
+}
