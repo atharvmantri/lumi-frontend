@@ -10,7 +10,7 @@ export default function Navbar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText('irm lumiassist.xyz/install.ps1 | iex');
+    navigator.clipboard.writeText('irm https://www.lumiassist.xyz/install.ps1 | iex');
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -65,9 +65,9 @@ export default function Navbar() {
           <li><a href="#privacy" className="nav__link">Privacy</a></li>
         </ul>
 
-        <button 
+        <button
           onClick={() => setIsModalOpen(true)}
-          className="nav__cta" 
+          className="nav__cta"
           style={{ cursor: 'pointer', border: 'none', fontFamily: 'inherit', fontSize: 'inherit' }}
         >
           Get Lumi
@@ -114,7 +114,7 @@ export default function Navbar() {
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              <button 
+              <button
                 onClick={() => setIsModalOpen(false)}
                 style={{
                   position: 'absolute',
@@ -145,9 +145,9 @@ export default function Navbar() {
 
               <div style={{ marginBottom: 'var(--space-md)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', fontWeight: 600 }}>
-                  <span style={{ 
+                  <span style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    width: '24px', height: '24px', borderRadius: '50%', 
+                    width: '24px', height: '24px', borderRadius: '50%',
                     background: 'var(--color-cyan-dim)', color: 'var(--color-cyan)', fontSize: '0.8rem'
                   }}>1</span>
                   Open PowerShell
@@ -159,18 +159,18 @@ export default function Navbar() {
 
               <div style={{ marginBottom: 'var(--space-xl)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', fontWeight: 600 }}>
-                  <span style={{ 
+                  <span style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    width: '24px', height: '24px', borderRadius: '50%', 
+                    width: '24px', height: '24px', borderRadius: '50%',
                     background: 'var(--color-cyan-dim)', color: 'var(--color-cyan)', fontSize: '0.8rem'
                   }}>2</span>
                   Paste Command & Press Enter
                 </div>
-                
-                <div style={{ 
+
+                <div style={{
                   marginLeft: '32px',
-                  background: '#1d1d1f', 
-                  borderRadius: 'var(--radius-sm)', 
+                  background: '#1d1d1f',
+                  borderRadius: 'var(--radius-sm)',
                   padding: '12px 16px',
                   display: 'flex',
                   alignItems: 'center',
@@ -178,7 +178,7 @@ export default function Navbar() {
                   gap: '12px'
                 }}>
                   <code style={{ color: '#fff', fontFamily: 'monospace', fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    irm lumiassist.xyz/install.ps1 | iex
+                    irm https://www.lumiassist.xyz/install.ps1 | iex
                   </code>
                   <button
                     onClick={handleCopy}
