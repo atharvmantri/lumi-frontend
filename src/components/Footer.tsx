@@ -34,7 +34,7 @@ export default function Footer() {
           <ul className="footer__links">
             <li>
               <a
-                href="https://github.com"
+                href="https://github.com/atharvmantri/lumi-assist"
                 className="footer__link"
                 target="_blank"
                 rel="noopener noreferrer"
