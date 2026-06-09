@@ -1,272 +1,387 @@
 # ============================================================
-#  Lumi - Interactive Installer
+#  Lumi - Premium Interactive Installer
 #  https://lumiassist.xyz
 # ============================================================
 $ErrorActionPreference = "Continue"
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$installStart = Get-Date
 
-# --- Helper Functions ---
-function Write-Step {
-    param([string]$Step, [string]$Text)
+# ── COLOR PALETTE ──────────────────────────────────────────
+$c = @{
+    Accent    = "Cyan"
+    Heading   = "White"
+    Body      = "Gray"
+    Muted     = "DarkGray"
+    Success   = "Green"
+    Warn      = "Yellow"
+    Error     = "Red"
+    Highlight = "Magenta"
+    Select    = "DarkCyan"
+}
+
+# ── BOX DRAWING ────────────────────────────────────────────
+$box = @{
+    H  = [char]0x2500  # ─
+    V  = [char]0x2502  # │
+    TL = [char]0x256D  # ╭
+    TR = [char]0x256E  # ╮
+    BL = [char]0x2570  # ╰
+    BR = [char]0x256F  # ╯
+    T  = [char]0x252C  # ┬
+    B  = [char]0x2534  # ┴
+    L  = [char]0x251C  # ├
+    R  = [char]0x2524  # ┤
+    Dot = [char]0x2022 # •
+    Arr = [char]0x25B8 # ▸
+    Chk = [char]0x2714 # ✔
+    Spc = [char]0x2581 # ▁
+}
+
+# ── HELPER: Draw a boxed section ──────────────────────────
+function Draw-Box {
+    param([string]$Title, [int]$Width = 56)
+    $inner = $Width - 2
+    $pad = $inner - $Title.Length - 2
+    if ($pad -lt 0) { $pad = 0 }
+    Write-Host "  $($box.TL)$("$($box.H)" * $inner)$($box.TR)" -ForegroundColor $c.Accent
+    Write-Host "  $($box.V) $Title$(" " * $pad) $($box.V)" -ForegroundColor $c.Accent
+    Write-Host "  $($box.BL)$("$($box.H)" * $inner)$($box.BR)" -ForegroundColor $c.Accent
+}
+
+# ── HELPER: Section divider ───────────────────────────────
+function Draw-Divider {
+    param([int]$Width = 56)
     Write-Host ""
-    Write-Host "  [$Step] $Text" -ForegroundColor Yellow
+    Write-Host "  $("$($box.H)" * $Width)" -ForegroundColor $c.Muted
 }
 
-function Write-Done {
-    param([string]$Text)
-    Write-Host "       $Text" -ForegroundColor Green
-}
-
-function Write-Info {
-    param([string]$Text)
-    Write-Host "       $Text" -ForegroundColor DarkGray
-}
-
-function Write-Err {
-    param([string]$Text)
-    Write-Host "       $Text" -ForegroundColor Red
-}
-
-function Write-Header {
-    param([string]$Text)
-    $line = "=" * 50
+# ── HELPER: Typewriter effect ─────────────────────────────
+function Write-Typed {
+    param([string]$Text, [string]$Color = "White", [int]$Delay = 12)
+    foreach ($char in $Text.ToCharArray()) {
+        Write-Host $char -NoNewline -ForegroundColor $Color
+        Start-Sleep -Milliseconds $Delay
+    }
     Write-Host ""
-    Write-Host "  $line" -ForegroundColor Cyan
-    Write-Host "    $Text" -ForegroundColor Cyan
-    Write-Host "  $line" -ForegroundColor Cyan
 }
 
-function Show-Menu {
+# ── HELPER: Spinner for long operations ───────────────────
+function Invoke-WithSpinner {
     param(
-        [string]$Title,
+        [string]$Label,
+        [scriptblock]$Action
+    )
+    $frames = @("    $($box.Arr) ", "   $($box.Arr)  ", "  $($box.Arr)   ", "   $($box.Arr)  ")
+    $spinChars = @([char]0x2596, [char]0x2598, [char]0x259D, [char]0x2597)  # ▖ ▘ ▝ ▗
+    
+    $job = Start-Job -ScriptBlock $Action
+    $i = 0
+    $sw = [System.Diagnostics.Stopwatch]::StartNew()
+    
+    while ($job.State -eq "Running") {
+        $elapsed = $sw.Elapsed.TotalSeconds
+        $elStr = "{0:N1}s" -f $elapsed
+        $spin = $spinChars[$i % 4]
+        Write-Host "`r    $spin $Label ($elStr)" -NoNewline -ForegroundColor $c.Body
+        Start-Sleep -Milliseconds 120
+        $i++
+    }
+    $sw.Stop()
+    $elapsed = $sw.Elapsed.TotalSeconds
+    $elStr = "{0:N1}s" -f $elapsed
+    
+    $result = Receive-Job $job -ErrorAction SilentlyContinue
+    Remove-Job $job -Force
+    
+    Write-Host "`r    $($box.Chk) $Label ($elStr)                    " -ForegroundColor $c.Success
+    return $result
+}
+
+# ── HELPER: Step header ───────────────────────────────────
+function Write-Step {
+    param([int]$Num, [int]$Total, [string]$Text)
+    $bar = ""
+    for ($i = 1; $i -le $Total; $i++) {
+        if ($i -lt $Num) { $bar += "$($box.Spc)" }
+        elseif ($i -eq $Num) { $bar += "$($box.Spc)" }
+        else { $bar += " " }
+    }
+    Write-Host ""
+    Write-Host "  $($box.Arr) STEP $Num/$Total" -ForegroundColor $c.Accent -NoNewline
+    Write-Host "  $Text" -ForegroundColor $c.Heading
+}
+
+# ── HELPER: Interactive menu ──────────────────────────────
+function Show-Select {
+    param(
+        [string]$Prompt,
         [string[]]$Options,
-        [string]$CustomPrompt = "Or type a custom value",
-        [bool]$AllowCustom = $true
+        [string[]]$Descriptions = @(),
+        [int]$Default = 0,
+        [bool]$AllowCustom = $false,
+        [string]$CustomLabel = "Enter a custom value"
     )
     Write-Host ""
-    Write-Host "  $Title" -ForegroundColor Yellow
-    Write-Host "  $("-" * $Title.Length)" -ForegroundColor DarkGray
+    Write-Host "  $Prompt" -ForegroundColor $c.Heading
+    Write-Host ""
+    
     if ($AllowCustom) {
-        Write-Host "   0) [Custom] Enter your own value" -ForegroundColor DarkCyan
+        Write-Host "    0 $($box.Dot) " -NoNewline -ForegroundColor $c.Select
+        Write-Host "[Custom] $CustomLabel" -ForegroundColor $c.Select
     }
+    
     for ($i = 0; $i -lt $Options.Count; $i++) {
-        Write-Host "   $($i + 1)) $($Options[$i])"
+        $num = $i + 1
+        $isDefault = ($i -eq $Default)
+        $marker = if ($isDefault) { "$($box.Arr)" } else { "$($box.Dot)" }
+        $suffix = if ($isDefault) { " (default)" } else { "" }
+        $color = if ($isDefault) { $c.Accent } else { $c.Body }
+        
+        Write-Host "    $num $marker " -NoNewline -ForegroundColor $color
+        Write-Host "$($Options[$i])$suffix" -NoNewline -ForegroundColor $color
+        if ($i -lt $Descriptions.Count -and $Descriptions[$i]) {
+            Write-Host " - $($Descriptions[$i])" -ForegroundColor $c.Muted
+        } else {
+            Write-Host ""
+        }
     }
     Write-Host ""
-    $choice = Read-Host "  Select (number)"
-    if ($AllowCustom -and $choice -eq "0") {
-        $custom = Read-Host "  Enter custom value"
-        return $custom
+    $input = Read-Host "    Choice"
+    
+    if ($AllowCustom -and $input -eq "0") {
+        return Read-Host "    $CustomLabel"
     }
-    $idx = [int]$choice - 1
+    if (-not $input) { return $Options[$Default] }
+    $idx = [int]$input - 1
     if ($idx -ge 0 -and $idx -lt $Options.Count) {
         return $Options[$idx]
     }
-    return $Options[0]
+    return $Options[$Default]
 }
 
-function Show-ModelMenu {
-    param(
-        [string]$ProviderKey,
-        [object]$Catalog
-    )
+# ── HELPER: Model selection from catalog ──────────────────
+function Show-ModelPicker {
+    param([string]$ProviderKey, [object]$Catalog)
+    
     $provider = $Catalog.$ProviderKey
     if (-not $provider -or -not $provider.groups -or $provider.groups.Count -eq 0) {
-        $custom = Read-Host "  Enter model ID"
-        return $custom
+        return (Read-Host "    Enter model ID")
     }
 
     Write-Host ""
-    Write-Host "  Choose a model for $($provider.label):" -ForegroundColor Yellow
-    Write-Host "  $("-" * 40)" -ForegroundColor DarkGray
-    Write-Host "   0) [Custom] Enter your own model ID" -ForegroundColor DarkCyan
+    Write-Host "  Select a model for $($provider.label):" -ForegroundColor $c.Heading
+    Write-Host ""
+    Write-Host "    0 $($box.Dot) " -NoNewline -ForegroundColor $c.Select
+    Write-Host "[Custom] Enter your own model ID" -ForegroundColor $c.Select
 
     $allModels = @()
     $counter = 1
     foreach ($group in $provider.groups) {
         Write-Host ""
-        Write-Host "   -- $($group.name) --" -ForegroundColor Magenta
+        Write-Host "    $($box.H)$($box.H) $($group.name) $($box.H * (40 - $group.name.Length))" -ForegroundColor $c.Highlight
         foreach ($model in $group.models) {
-            $tag = "$($model.name)"
-            $note = " ($($model.note))"
-            Write-Host "   $counter) $tag" -NoNewline
-            Write-Host $note -ForegroundColor DarkGray
             $allModels += $model
+            $numStr = "{0,4}" -f $counter
+            Write-Host "$numStr $($box.Dot) " -NoNewline -ForegroundColor $c.Body
+            Write-Host "$($model.name)" -NoNewline -ForegroundColor $c.Heading
+            Write-Host " - $($model.note)" -ForegroundColor $c.Muted
             $counter++
         }
     }
     Write-Host ""
-    $choice = Read-Host "  Select (number)"
+    $choice = Read-Host "    Choice"
     if ($choice -eq "0") {
-        $custom = Read-Host "  Enter custom model ID"
-        return $custom
+        return (Read-Host "    Enter custom model ID")
     }
     $idx = [int]$choice - 1
     if ($idx -ge 0 -and $idx -lt $allModels.Count) {
-        $selected = $allModels[$idx]
-        Write-Done "Selected: $($selected.name) ($($selected.id))"
-        return $selected.id
+        $sel = $allModels[$idx]
+        Write-Host "    $($box.Chk) $($sel.name) ($($sel.id))" -ForegroundColor $c.Success
+        return $sel.id
     }
-    Write-Info "Invalid selection, using first model as default."
     $fallback = $allModels[0]
+    Write-Host "    $($box.Chk) $($fallback.name) ($($fallback.id))" -ForegroundColor $c.Success
     return $fallback.id
 }
 
-# ============================================================
-#  BANNER
-# ============================================================
+# ╔════════════════════════════════════════════════════════════╗
+# ║                      WELCOME SCREEN                       ║
+# ╚════════════════════════════════════════════════════════════╝
 Clear-Host
 Write-Host ""
-Write-Host "  LL      UU   UU  MM     MM  IIIIII" -ForegroundColor Cyan
-Write-Host "  LL      UU   UU  MMM   MMM    II  " -ForegroundColor Cyan
-Write-Host "  LL      UU   UU  MM M M MM    II  " -ForegroundColor Cyan
-Write-Host "  LL      UU   UU  MM  M  MM    II  " -ForegroundColor Cyan
-Write-Host "  LLLLLL   UUUUU   MM     MM  IIIIII" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "  Your Private AI Voice Assistant" -ForegroundColor DarkGray
-Write-Host "  ------------------------------------------------" -ForegroundColor DarkGray
+Write-Host "       ___                          ___  " -ForegroundColor Cyan
+Write-Host "      /\  \                        /\  \ " -ForegroundColor Cyan
+Write-Host "     /::\  \       ___   ___      /::\  \" -ForegroundColor Cyan
+Write-Host "    /:/\:\  \     /\__\ /\__\    /:/\:\__\" -ForegroundColor DarkCyan
+Write-Host "   /:/ /::\  \   /:/ / /:/ /   /:/ /:/  /" -ForegroundColor DarkCyan
+Write-Host "  /:/_/:/\:\__\ /:/_/ /:/_/   /:/_/:/__/" -ForegroundColor DarkCyan
+Write-Host "  \:\/:/  \/__/ \:\  / \:\  \  \:\/::::/ " -ForegroundColor Blue
+Write-Host "   \::/__/       \:\__\ \:\__\  \::/~~/  " -ForegroundColor Blue
+Write-Host "    \:\  \        \/__/  \/__/   \:\~~\  " -ForegroundColor Blue
+Write-Host "     \:\__\                       \:\__\ " -ForegroundColor DarkBlue
+Write-Host "      \/__/                        \/__/ " -ForegroundColor DarkBlue
 Write-Host ""
-Write-Host "  Welcome! This installer will set up Lumi on" -ForegroundColor White
-Write-Host "  your machine in just a few minutes." -ForegroundColor White
+Write-Host "  $($box.H * 50)" -ForegroundColor $c.Muted
+Write-Typed "  Your private, offline AI voice assistant." $c.Body 15
+Write-Host "  $($box.H * 50)" -ForegroundColor $c.Muted
 Write-Host ""
-Write-Host "  Choose an installation mode:" -ForegroundColor Yellow
-Write-Host ""
-Write-Host "   1) Quickstart" -ForegroundColor White
-Write-Host "      Uses sensible defaults. Done in under 5 min." -ForegroundColor DarkGray
-Write-Host ""
-Write-Host "   2) Custom  [Recommended]" -ForegroundColor Green
-Write-Host "      Pick your AI provider, model, voice, and more." -ForegroundColor DarkGray
-Write-Host ""
-$mode = Read-Host "  Enter your choice (1 or 2)"
+Start-Sleep -Milliseconds 400
 
-# ============================================================
-#  DEFAULTS
-# ============================================================
-$sttModel       = "large-v3"
-$sttDevice      = "cuda"
-$sttCompute     = "float16"
-$llmProvider    = "hackclub"
-$llmModelId     = "openrouter/free"
-$llmBaseUrl     = "https://ai.hackclub.com/proxy/v1"
-$llmApiKeyEnv   = "HACKCLUB_API_KEY"
-$ttsVoice       = "en_GB-southern_english_female-low"
-$wakeWord       = "hey lumi"
-$apiKeyValue    = ""
+Write-Host "  This installer will configure and set up Lumi" -ForegroundColor $c.Body
+Write-Host "  on your system. Everything runs locally on your" -ForegroundColor $c.Body
+Write-Host "  hardware. Your data never leaves your machine." -ForegroundColor $c.Body
+Write-Host ""
+Start-Sleep -Milliseconds 300
 
-# ============================================================
-#  DOWNLOAD MODEL CATALOG
-# ============================================================
+Draw-Divider
+
+Write-Host ""
+Write-Host "  How would you like to set up Lumi?" -ForegroundColor $c.Heading
+Write-Host ""
+Write-Host "    1 $($box.Arr) " -NoNewline -ForegroundColor $c.Body
+Write-Host "Quickstart" -NoNewline -ForegroundColor $c.Heading
+Write-Host "  Uses smart defaults. Done in minutes." -ForegroundColor $c.Muted
+Write-Host ""
+Write-Host "    2 $($box.Arr) " -NoNewline -ForegroundColor $c.Accent
+Write-Host "Custom" -NoNewline -ForegroundColor $c.Accent
+Write-Host "      Choose your AI, voice, and settings." -ForegroundColor $c.Muted
+Write-Host "               Recommended for most users." -ForegroundColor $c.Muted
+Write-Host ""
+$mode = Read-Host "    Choice (default: 2)"
+if (-not $mode) { $mode = "2" }
+
+# ╔════════════════════════════════════════════════════════════╗
+# ║                        DEFAULTS                           ║
+# ╚════════════════════════════════════════════════════════════╝
+$sttModel     = "large-v3"
+$sttDevice    = "cuda"
+$sttCompute   = "float16"
+$llmProvider  = "hackclub"
+$llmModelId   = "openrouter/free"
+$llmBaseUrl   = "https://ai.hackclub.com/proxy/v1"
+$llmApiKeyEnv = "HACKCLUB_API_KEY"
+$ttsVoice     = "en_GB-southern_english_female-low"
+$wakeWord     = "hey lumi"
+$apiKeyValue  = ""
+
+# ── FETCH MODEL CATALOG ──────────────────────────────────
 $catalog = $null
 try {
-    $catalogJson = Invoke-RestMethod -Uri "https://www.lumiassist.xyz/models.json" -ErrorAction Stop
-    $catalog = $catalogJson
+    $catalog = Invoke-RestMethod -Uri "https://www.lumiassist.xyz/models.json" -ErrorAction Stop
 } catch {
-    Write-Info "Could not fetch model catalog from server. Using built-in defaults."
+    # Silent fallback
 }
 
-# ============================================================
-#  CUSTOM CONFIGURATION
-# ============================================================
+# ╔════════════════════════════════════════════════════════════╗
+# ║                   CUSTOM CONFIGURATION                    ║
+# ╚════════════════════════════════════════════════════════════╝
 if ($mode -eq "2") {
-    Write-Header "Custom Configuration"
-
-    # --- Wake Word ---
+    Draw-Divider
+    Draw-Box "CONFIGURATION"
+    
+    # ── Wake Word ──
     Write-Host ""
-    Write-Host "  What should Lumi listen for?" -ForegroundColor Yellow
-    $inputWake = Read-Host "  Wake word (default: hey lumi)"
+    Write-Host "  What phrase should wake Lumi up?" -ForegroundColor $c.Heading
+    Write-Host "  This is what you say to get Lumi's attention." -ForegroundColor $c.Muted
+    Write-Host ""
+    $inputWake = Read-Host "    Wake word (default: hey lumi)"
     if ($inputWake) { $wakeWord = $inputWake }
+    Write-Host "    $($box.Chk) Wake word: $wakeWord" -ForegroundColor $c.Success
 
-    # --- Speech-to-Text ---
-    $sttOptions = @(
-        "tiny       - Fastest, lowest accuracy",
-        "base       - Good for quick tasks",
-        "small      - Balanced",
-        "medium     - High accuracy",
-        "large-v3   - Best accuracy (default)"
-    )
-    $sttNames = @("tiny", "base", "small", "medium", "large-v3")
-    Write-Host ""
-    Write-Host "  Choose a Speech-to-Text (Whisper) model:" -ForegroundColor Yellow
-    Write-Host "  $("-" * 42)" -ForegroundColor DarkGray
-    for ($i = 0; $i -lt $sttOptions.Count; $i++) {
-        Write-Host "   $($i + 1)) $($sttOptions[$i])"
-    }
-    Write-Host ""
-    $sttChoice = Read-Host "  Select (1-5, default: 5)"
-    if ($sttChoice -match "^[1-5]$") {
-        $sttModel = $sttNames[[int]$sttChoice - 1]
-    }
-    Write-Done "STT Model: $sttModel"
-
-    # --- STT Device ---
-    Write-Host ""
-    Write-Host "  STT compute device:" -ForegroundColor Yellow
-    Write-Host "   1) cuda  - GPU, much faster (default)"
-    Write-Host "   2) cpu   - No GPU required"
-    $devChoice = Read-Host "  Select (1-2, default: 1)"
-    if ($devChoice -eq "2") {
+    # ── Speech-to-Text ──
+    Draw-Divider
+    $sttModel = Show-Select `
+        -Prompt "Speech-to-Text model (Whisper):" `
+        -Options @("tiny", "base", "small", "medium", "large-v3") `
+        -Descriptions @(
+            "Fastest. ~1GB RAM. Lower accuracy",
+            "Quick. ~1GB RAM. Decent accuracy",
+            "Balanced. ~2GB RAM. Good accuracy",
+            "Accurate. ~5GB RAM. Slower",
+            "Best accuracy. ~10GB RAM"
+        ) `
+        -Default 4
+    Write-Host "    $($box.Chk) STT: $sttModel" -ForegroundColor $c.Success
+    
+    # ── STT Device ──
+    $devResult = Show-Select `
+        -Prompt "Compute device for speech recognition:" `
+        -Options @("GPU (CUDA)", "CPU only") `
+        -Descriptions @(
+            "Much faster. Requires NVIDIA GPU",
+            "Works everywhere. Slower"
+        ) `
+        -Default 0
+    if ($devResult -eq "CPU only") {
         $sttDevice = "cpu"
         $sttCompute = "int8"
     }
-    Write-Done "Device: $sttDevice ($sttCompute)"
+    Write-Host "    $($box.Chk) Device: $sttDevice ($sttCompute)" -ForegroundColor $c.Success
 
-    # --- LLM Provider ---
+    # ── LLM Provider ──
+    Draw-Divider
     $providerKeys  = @("hackclub", "openrouter", "openai", "anthropic", "google", "custom")
-    $providerNames = @(
-        "HackClub Free    - Free tier, no API key needed",
-        "OpenRouter       - Access all models via one key",
-        "OpenAI Direct    - GPT-5.5, GPT-5.4, etc.",
-        "Anthropic Direct - Claude Opus 4.8, Sonnet 4.6, etc.",
-        "Google AI Direct - Gemini 3.5 Flash, 2.5 Pro, etc.",
-        "Custom Provider  - BYO endpoint and key"
+    $providerLabels = @(
+        "HackClub Free",
+        "OpenRouter",
+        "OpenAI Direct",
+        "Anthropic Direct",
+        "Google AI Direct",
+        "Custom Provider"
     )
-    Write-Host ""
-    Write-Host "  Choose your LLM Provider:" -ForegroundColor Yellow
-    Write-Host "  $("-" * 42)" -ForegroundColor DarkGray
-    for ($i = 0; $i -lt $providerNames.Count; $i++) {
-        Write-Host "   $($i + 1)) $($providerNames[$i])"
-    }
-    Write-Host ""
-    $provChoice = Read-Host "  Select (1-6, default: 1)"
-    if (-not $provChoice) { $provChoice = "1" }
-    $provIdx = [int]$provChoice - 1
-    if ($provIdx -lt 0 -or $provIdx -ge $providerKeys.Count) { $provIdx = 0 }
+    $providerDescs = @(
+        "Free tier. No API key needed",
+        "One key, access all major models",
+        "GPT-5.5, GPT-5.4, GPT-4.1, and more",
+        "Claude Opus 4.8, Sonnet 4.6, Haiku 4.5",
+        "Gemini 3.5 Flash, 2.5 Pro, and more",
+        "Bring your own endpoint and API key"
+    )
+    
+    $provResult = Show-Select `
+        -Prompt "Choose your AI provider:" `
+        -Options $providerLabels `
+        -Descriptions $providerDescs `
+        -Default 0
+    
+    $provIdx = [array]::IndexOf($providerLabels, $provResult)
+    if ($provIdx -lt 0) { $provIdx = 0 }
     $llmProvider = $providerKeys[$provIdx]
-
-    # Set base_url and api_key_env from catalog
+    
     if ($catalog -and $catalog.$llmProvider) {
         $llmBaseUrl   = $catalog.$llmProvider.base_url
         $llmApiKeyEnv = $catalog.$llmProvider.api_key_env
     }
-
-    # Custom provider needs manual URL
+    
     if ($llmProvider -eq "custom") {
-        $llmBaseUrl = Read-Host "  Enter your API base URL (e.g. http://localhost:1234/v1)"
+        Write-Host ""
+        $llmBaseUrl = Read-Host "    Enter your API base URL"
         $llmApiKeyEnv = "CUSTOM_API_KEY"
     }
-
-    # --- LLM Model ---
+    
+    Write-Host "    $($box.Chk) Provider: $($providerLabels[$provIdx])" -ForegroundColor $c.Success
+    
+    # ── LLM Model ──
+    Draw-Divider
     if ($catalog) {
-        $llmModelId = Show-ModelMenu -ProviderKey $llmProvider -Catalog $catalog
+        $llmModelId = Show-ModelPicker -ProviderKey $llmProvider -Catalog $catalog
     } else {
-        $llmModelId = Read-Host "  Enter model ID (e.g. gpt-5.4-mini, claude-sonnet-4-6)"
+        Write-Host ""
+        $llmModelId = Read-Host "    Enter model ID"
     }
-
-    # --- API Key ---
+    
+    # ── API Key ──
     if ($llmProvider -ne "hackclub") {
         Write-Host ""
-        $apiKeyValue = Read-Host "  Enter your API key for $($providerNames[$provIdx].Split('-')[0].Trim()) (or Enter to skip)"
+        Write-Host "  Enter your API key:" -ForegroundColor $c.Heading
+        Write-Host "  This will be saved in .env and never transmitted anywhere." -ForegroundColor $c.Muted
+        Write-Host ""
+        $apiKeyValue = Read-Host "    API key (or press Enter to set up later)"
     }
 
-    # --- TTS Voice ---
-    $voiceOptions = @(
-        "en_GB-southern_english_female-low   - English GB Female (default)",
-        "en_US-lessac-medium                 - English US Female",
-        "en_US-ryan-medium                   - English US Male",
-        "en_GB-alan-medium                   - English GB Male",
-        "de_DE-thorsten-medium               - German Male",
-        "fr_FR-siwis-medium                  - French Female",
-        "es_ES-davefx-medium                 - Spanish Male"
-    )
+    # ── TTS Voice ──
+    Draw-Divider
     $voiceIds = @(
         "en_GB-southern_english_female-low",
         "en_US-lessac-medium",
@@ -276,155 +391,181 @@ if ($mode -eq "2") {
         "fr_FR-siwis-medium",
         "es_ES-davefx-medium"
     )
-    Write-Host ""
-    Write-Host "  Choose a TTS Voice (Piper):" -ForegroundColor Yellow
-    Write-Host "  $("-" * 42)" -ForegroundColor DarkGray
-    Write-Host "   0) [Custom] Enter your own voice ID" -ForegroundColor DarkCyan
-    for ($i = 0; $i -lt $voiceOptions.Count; $i++) {
-        Write-Host "   $($i + 1)) $($voiceOptions[$i])"
+    $voiceLabels = @(
+        "English (GB) Female",
+        "English (US) Female",
+        "English (US) Male",
+        "English (GB) Male",
+        "German Male",
+        "French Female",
+        "Spanish Male"
+    )
+    $voiceDescs = @(
+        "Warm, natural British accent",
+        "Clear, professional American",
+        "Deep, authoritative American",
+        "Classic British male",
+        "Natural German speaker",
+        "Smooth French speaker",
+        "Clear Spanish speaker"
+    )
+    
+    $voiceResult = Show-Select `
+        -Prompt "Choose Lumi's voice:" `
+        -Options $voiceLabels `
+        -Descriptions $voiceDescs `
+        -Default 0 `
+        -AllowCustom $true `
+        -CustomLabel "Enter a custom Piper voice ID"
+    
+    $voiceIdx = [array]::IndexOf($voiceLabels, $voiceResult)
+    if ($voiceIdx -ge 0) {
+        $ttsVoice = $voiceIds[$voiceIdx]
+    } else {
+        $ttsVoice = $voiceResult
     }
-    Write-Host ""
-    $voiceChoice = Read-Host "  Select (0-$($voiceOptions.Count), default: 1)"
-    if ($voiceChoice -eq "0") {
-        $ttsVoice = Read-Host "  Enter custom Piper voice ID"
-    } elseif ($voiceChoice -match "^[1-7]$") {
-        $ttsVoice = $voiceIds[[int]$voiceChoice - 1]
-    }
-    Write-Done "Voice: $ttsVoice"
+    Write-Host "    $($box.Chk) Voice: $ttsVoice" -ForegroundColor $c.Success
 }
 
-# ============================================================
-#  CONFIGURATION SUMMARY
-# ============================================================
-Write-Header "Configuration Summary"
+# ╔════════════════════════════════════════════════════════════╗
+# ║                   CONFIGURATION SUMMARY                   ║
+# ╚════════════════════════════════════════════════════════════╝
+Draw-Divider
+Draw-Box "REVIEW YOUR CONFIGURATION"
 Write-Host ""
-Write-Host "   Wake Word  : $wakeWord" -ForegroundColor White
-Write-Host "   STT Model  : $sttModel ($sttDevice)" -ForegroundColor White
-Write-Host "   LLM        : $llmProvider / $llmModelId" -ForegroundColor White
-Write-Host "   TTS Voice  : $ttsVoice" -ForegroundColor White
+
+$summaryItems = @(
+    @("Wake Word",    $wakeWord),
+    @("STT Model",    "$sttModel ($sttDevice)"),
+    @("LLM Provider", $llmProvider),
+    @("LLM Model",    $llmModelId),
+    @("TTS Voice",    $ttsVoice)
+)
+
+foreach ($item in $summaryItems) {
+    $label = "{0,-14}" -f $item[0]
+    Write-Host "    $($box.V) " -NoNewline -ForegroundColor $c.Muted
+    Write-Host "$label" -NoNewline -ForegroundColor $c.Accent
+    Write-Host " $($item[1])" -ForegroundColor $c.Heading
+}
+
 Write-Host ""
-Write-Host "  Press Enter to begin installation, or Ctrl+C to abort." -ForegroundColor DarkGray
+Write-Host "  Press Enter to begin, or Ctrl+C to abort." -ForegroundColor $c.Muted
 Read-Host "  "
 
-# ============================================================
-#  STEP 1: Clone / Update Repository
-# ============================================================
+# ╔════════════════════════════════════════════════════════════╗
+# ║                     INSTALLATION                          ║
+# ╚════════════════════════════════════════════════════════════╝
+Draw-Divider
+Draw-Box "INSTALLING"
+
+# ── STEP 1: Repository ───────────────────────────────────
+Write-Step -Num 1 -Total 7 -Text "Repository"
 $target = "$HOME\Lumi-Assist"
 if (Test-Path $target) {
-    Write-Step "1/7" "Updating existing repository..."
+    Write-Host "    $($box.Dot) Found existing installation. Pulling updates..." -ForegroundColor $c.Body
     Set-Location $target
     git pull --quiet 2>$null
-    Write-Done "Repository updated."
+    Write-Host "    $($box.Chk) Repository updated." -ForegroundColor $c.Success
 } else {
-    Write-Step "1/7" "Cloning Lumi-Assist..."
-    Write-Info "Downloading to $target"
+    Write-Host "    $($box.Dot) Cloning to $target..." -ForegroundColor $c.Body
     git clone --quiet https://github.com/atharvmantri/Lumi-Assist.git $target
     Set-Location $target
-    Write-Done "Repository cloned."
+    Write-Host "    $($box.Chk) Repository cloned." -ForegroundColor $c.Success
 }
 
-# ============================================================
-#  STEP 2: Python Check
-# ============================================================
-Write-Step "2/7" "Checking Python..."
+# ── STEP 2: Python ────────────────────────────────────────
+Write-Step -Num 2 -Total 7 -Text "Python Environment"
 $pyCmd = $null
-# Try py launcher first (Python 3.11)
 if (Get-Command "py" -ErrorAction SilentlyContinue) {
     try {
         $ver = & py -3.11 --version 2>$null
         if ($LASTEXITCODE -eq 0) {
             $pyCmd = "py -3.11"
-            Write-Done "Found: $ver (via py launcher)"
+            Write-Host "    $($box.Chk) $ver (py launcher)" -ForegroundColor $c.Success
         }
     } catch {}
 }
-# Fallback to python on PATH
 if (-not $pyCmd) {
     if (Get-Command "python" -ErrorAction SilentlyContinue) {
         $ver = & python --version 2>$null
         $pyCmd = "python"
-        Write-Done "Found: $ver"
+        Write-Host "    $($box.Chk) $ver" -ForegroundColor $c.Success
     } else {
-        Write-Err "Python not found! Please install Python 3.11+ and re-run."
-        Write-Err "Download: https://www.python.org/downloads/"
-        Read-Host "Press Enter to exit"
+        Write-Host "    X Python not found!" -ForegroundColor $c.Error
+        Write-Host "      Install Python 3.11+ from python.org/downloads" -ForegroundColor $c.Error
+        Read-Host "      Press Enter to exit"
         exit 1
     }
 }
 
-# ============================================================
-#  STEP 3: Virtual Environment
-# ============================================================
-Write-Step "3/7" "Setting up virtual environment..."
+# ── STEP 3: Virtual Environment ──────────────────────────
+Write-Step -Num 3 -Total 7 -Text "Virtual Environment"
 if (-not (Test-Path "venv")) {
+    Write-Host "    $($box.Dot) Creating isolated Python environment..." -ForegroundColor $c.Body
     Invoke-Expression "$pyCmd -m venv venv" 2>$null
-    Write-Done "Virtual environment created."
+    Write-Host "    $($box.Chk) Virtual environment created." -ForegroundColor $c.Success
 } else {
-    Write-Done "Virtual environment already exists."
+    Write-Host "    $($box.Chk) Already exists. Reusing." -ForegroundColor $c.Success
 }
 
-# ============================================================
-#  STEP 4: Dependencies
-# ============================================================
-Write-Step "4/7" "Installing dependencies..."
-Write-Info "This may take 2-5 minutes on first install."
+# ── STEP 4: Dependencies ─────────────────────────────────
+Write-Step -Num 4 -Total 7 -Text "Dependencies"
+Write-Host "    $($box.Dot) Installing packages. This may take a few minutes..." -ForegroundColor $c.Body
+$sw4 = [System.Diagnostics.Stopwatch]::StartNew()
 & .\venv\Scripts\python.exe -m pip install --quiet --upgrade pip --no-cache-dir 2>$null
 & .\venv\Scripts\python.exe -m pip install --quiet -r requirements.txt --no-cache-dir 2>$null
-Write-Done "All dependencies installed."
+$sw4.Stop()
+$t4 = "{0:N1}s" -f $sw4.Elapsed.TotalSeconds
+Write-Host "    $($box.Chk) All dependencies installed. ($t4)" -ForegroundColor $c.Success
 
-# ============================================================
-#  STEP 5: Voice Model
-# ============================================================
-Write-Step "5/7" "Downloading voice model ($ttsVoice)..."
+# ── STEP 5: Voice Model ──────────────────────────────────
+Write-Step -Num 5 -Total 7 -Text "Voice Model"
 $voiceDir = "models\piper"
 if (-not (Test-Path $voiceDir)) { New-Item -ItemType Directory -Force -Path $voiceDir | Out-Null }
 
-# Build the HuggingFace path from voice ID
-# Voice ID format: lang_REGION-name-quality -> lang/lang_REGION/name/quality/full_id
 $parts = $ttsVoice -split "-"
 if ($parts.Count -ge 3) {
-    $langRegion = $parts[0]       # e.g. en_GB
-    $lang = $langRegion.Split("_")[0]  # e.g. en
-    $quality = $parts[-1]          # e.g. low, medium
+    $langRegion = $parts[0]
+    $lang = $langRegion.Split("_")[0]
+    $quality = $parts[-1]
     $nameParts = $parts[1..($parts.Count - 2)]
-    $name = $nameParts -join "_"   # e.g. southern_english_female
-
+    $name = $nameParts -join "_"
     $hfPath = "$lang/$langRegion/$name/$quality/$ttsVoice"
 
     if (-not (Test-Path "$voiceDir\$ttsVoice.onnx")) {
+        Write-Host "    $($box.Dot) Downloading $ttsVoice from HuggingFace..." -ForegroundColor $c.Body
+        $sw5 = [System.Diagnostics.Stopwatch]::StartNew()
         & .\venv\Scripts\python.exe -m pip install --quiet huggingface-hub --no-cache-dir 2>$null
         try {
             & .\venv\Scripts\python.exe -c "from huggingface_hub import hf_hub_download; hf_hub_download('rhasspy/piper-voices', '$hfPath.onnx', local_dir='models/piper')" 2>$null
             & .\venv\Scripts\python.exe -c "from huggingface_hub import hf_hub_download; hf_hub_download('rhasspy/piper-voices', '$hfPath.onnx.json', local_dir='models/piper')" 2>$null
-            Write-Done "Voice model downloaded."
+            $sw5.Stop()
+            $t5 = "{0:N1}s" -f $sw5.Elapsed.TotalSeconds
+            Write-Host "    $($box.Chk) Voice model ready. ($t5)" -ForegroundColor $c.Success
         } catch {
-            Write-Err "Could not download voice model. You can download it manually later."
-            Write-Info "Repo: https://huggingface.co/rhasspy/piper-voices"
+            Write-Host "    ! Could not download automatically." -ForegroundColor $c.Warn
+            Write-Host "      You can grab it from: huggingface.co/rhasspy/piper-voices" -ForegroundColor $c.Muted
         }
     } else {
-        Write-Done "Voice model already present."
+        Write-Host "    $($box.Chk) Already downloaded." -ForegroundColor $c.Success
     }
 } else {
-    Write-Info "Non-standard voice ID format. Skipping auto-download."
-    Write-Info "You can manually place .onnx files in models/piper/"
+    Write-Host "    $($box.Dot) Custom voice ID. Skipping auto-download." -ForegroundColor $c.Body
+    Write-Host "      Place .onnx files in models/piper/ manually." -ForegroundColor $c.Muted
 }
 
-# ============================================================
-#  STEP 6: Write Configuration
-# ============================================================
-Write-Step "6/7" "Writing configuration..."
+# ── STEP 6: Configuration Files ──────────────────────────
+Write-Step -Num 6 -Total 7 -Text "Configuration Files"
 
-# Write .env
 $envContent = ""
 if ($apiKeyValue) {
     $envContent = "$llmApiKeyEnv=$apiKeyValue"
-}
-if ($llmProvider -eq "hackclub") {
+} elseif ($llmProvider -eq "hackclub") {
     $envContent = "HACKCLUB_API_KEY="
 }
 Set-Content -Path ".env" -Value $envContent
 
-# Write config.yaml
 $yaml = @"
 lumi:
   wake_word: "$wakeWord"
@@ -466,33 +607,57 @@ audio:
   sample_rate: 16000
 "@
 Set-Content -Path "config.yaml" -Value $yaml
-Write-Done "config.yaml and .env written."
+Write-Host "    $($box.Chk) config.yaml written." -ForegroundColor $c.Success
+Write-Host "    $($box.Chk) .env written." -ForegroundColor $c.Success
 
-# ============================================================
-#  STEP 7: Finalize
-# ============================================================
-Write-Step "7/7" "Finalizing..."
+# ── STEP 7: Finalize ─────────────────────────────────────
+Write-Step -Num 7 -Total 7 -Text "Finalizing"
 $dirs = @("data\conversations", "logs\learning", "logs\screenshots", "data\wake_samples")
 foreach ($dir in $dirs) {
     if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
 }
-Write-Done "Directory structure created."
+Write-Host "    $($box.Chk) All directories created." -ForegroundColor $c.Success
 
-# ============================================================
-#  DONE
-# ============================================================
+# ╔════════════════════════════════════════════════════════════╗
+# ║                       COMPLETE                            ║
+# ╚════════════════════════════════════════════════════════════╝
+$totalTime = ((Get-Date) - $installStart).TotalSeconds
+$totalStr = "{0:N0}" -f $totalTime
+
 Write-Host ""
-Write-Host "  ==================================================" -ForegroundColor Green
-Write-Host "    Installation Complete!                           " -ForegroundColor Green
-Write-Host "  ==================================================" -ForegroundColor Green
 Write-Host ""
-Write-Host "   Installed to : $target" -ForegroundColor White
-Write-Host "   LLM          : $llmProvider / $llmModelId" -ForegroundColor White
-Write-Host "   Voice        : $ttsVoice" -ForegroundColor White
+Write-Host "  $($box.TL)$($box.H * 52)$($box.TR)" -ForegroundColor $c.Success
+Write-Host "  $($box.V)                                                    $($box.V)" -ForegroundColor $c.Success
+Write-Host "  $($box.V)   " -NoNewline -ForegroundColor $c.Success
+Write-Host "Installation complete." -NoNewline -ForegroundColor Green
+Write-Host "                       $($box.V)" -ForegroundColor $c.Success
+Write-Host "  $($box.V)                                                    $($box.V)" -ForegroundColor $c.Success
+Write-Host "  $($box.BL)$($box.H * 52)$($box.BR)" -ForegroundColor $c.Success
 Write-Host ""
-Write-Host "   To start Lumi, open that folder and" -ForegroundColor White
-Write-Host "   double-click `"launch.bat`"" -ForegroundColor Cyan
+
+$finalItems = @(
+    @("Location",  $target),
+    @("Provider",  "$llmProvider / $llmModelId"),
+    @("Voice",     $ttsVoice),
+    @("Time",      "${totalStr}s")
+)
+
+foreach ($item in $finalItems) {
+    $label = "{0,-10}" -f $item[0]
+    Write-Host "    $($box.Dot) " -NoNewline -ForegroundColor $c.Muted
+    Write-Host "$label" -NoNewline -ForegroundColor $c.Accent
+    Write-Host " $($item[1])" -ForegroundColor $c.Body
+}
+
 Write-Host ""
-Write-Host "   To reconfigure, edit config.yaml or" -ForegroundColor DarkGray
-Write-Host "   re-run the installer." -ForegroundColor DarkGray
+Write-Host "  $($box.H * 52)" -ForegroundColor $c.Muted
+Write-Host ""
+Write-Host "    To launch Lumi:" -ForegroundColor $c.Heading
+Write-Host ""
+Write-Host "      cd $target" -ForegroundColor $c.Accent
+Write-Host "      .\launch.bat" -ForegroundColor $c.Accent
+Write-Host ""
+Write-Host "    To reconfigure, edit config.yaml or run" -ForegroundColor $c.Muted
+Write-Host "    this installer again." -ForegroundColor $c.Muted
+Write-Host ""
 Write-Host ""
