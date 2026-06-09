@@ -4,18 +4,17 @@ import matter from 'gray-matter';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import { MdxComponents } from '@/components/docs/MdxComponents';
 
-export async function generateStaticParams() {
-  const docsDir = path.join(process.cwd(), 'src/content/docs');
-  const files = fs.readdirSync(docsDir);
 
-  return files.map((file) => ({
-    slug: [file.replace(/\.mdx$/, '')],
-  }));
-}
 
 export default async function DocPage({ params }: { params: { slug: string[] } }) {
   const { slug } = await params;
-  const filePath = path.join(process.cwd(), 'src/content/docs', `${slug.join('/')}.mdx`);
+  
+  const basePath = path.join(process.cwd(), 'src/content/docs', ...slug);
+  let filePath = basePath + '.mdx';
+  
+  if (!fs.existsSync(filePath)) {
+    filePath = path.join(basePath, 'index.mdx');
+  }
   
   let source = '';
   try {

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -63,6 +64,7 @@ export default function Navbar() {
           <li><a href="#tools" className="nav__link">Tools</a></li>
           <li><a href="#how-it-works" className="nav__link">How It Works</a></li>
           <li><a href="#privacy" className="nav__link">Privacy</a></li>
+          <li><Link href="/docs/get-started" className="nav__link">Docs</Link></li>
         </ul>
 
         <button
