@@ -30,7 +30,7 @@ export default function Footer() {
           <p className="footer__copy">
             &copy; {CURRENT_YEAR} Lumi. All rights reserved.
           </p>
-          
+
           <p className="footer__copy" style={{ marginTop: '0.5rem', fontSize: '0.8rem', opacity: 0.7 }}>
             AI Declaration: Claude and Gemini were used to assist in the coding and planning of this project.
           </p>
@@ -44,24 +44,6 @@ export default function Footer() {
                 rel="noopener noreferrer"
               >
                 GitHub
-              </a>
-            </li>
-            <li>
-              <a
-                href="https://twitter.com"
-                className="footer__link"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Twitter
-              </a>
-            </li>
-            <li>
-              <a
-                href="#docs"
-                className="footer__link"
-              >
-                Documentation
               </a>
             </li>
           </ul>
