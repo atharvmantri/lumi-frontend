@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 const CURRENT_YEAR = 2026;
 
@@ -16,7 +17,13 @@ export default function Footer() {
       <div className="container">
         <div className="footer__inner">
           <div className="footer__brand">
-            <span className="footer__brand-dot" />
+            <Image
+              src="/logo-icon.png"
+              alt="Lumi"
+              width={22}
+              height={22}
+              className="footer__brand-img"
+            />
             Lumi
           </div>
 

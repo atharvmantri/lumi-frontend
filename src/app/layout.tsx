@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Lumi — The Ultimate AI Co-Pilot for Windows",
+  title: "Lumi — The Open-Source, Integrated Windows AI",
   description:
-    "Lumi is a fully local, always-on AI voice assistant for Windows. GPU-accelerated, entirely private, and unrestricted. Zero friction. Just talk.",
+    "Lumi is a minimalist, responsive AI voice assistant that understands, thinks, and responds directly from your screen. Built by developers, for developers. Fully local, always-on, GPU-accelerated.",
   keywords: [
     "AI voice assistant",
     "Windows AI",
@@ -14,18 +14,24 @@ export const metadata: Metadata = {
     "GPU accelerated",
     "speech to text",
     "Lumi",
+    "open source",
+    "developer tools",
   ],
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/logo-icon.png",
+  },
   openGraph: {
-    title: "Lumi — The Ultimate AI Co-Pilot for Windows",
+    title: "Lumi — The Open-Source, Integrated Windows AI",
     description:
-      "A fully local, always-on AI voice assistant. GPU-accelerated, entirely private, and unrestricted.",
+      "A minimalist, responsive assistant that understands, thinks, and responds directly from your screen. Built by developers, for developers.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Lumi — The Ultimate AI Co-Pilot for Windows",
+    title: "Lumi — The Open-Source, Integrated Windows AI",
     description:
-      "A fully local, always-on AI voice assistant. GPU-accelerated, entirely private, and unrestricted.",
+      "A minimalist, responsive assistant that understands, thinks, and responds directly from your screen. Built by developers, for developers.",
   },
 };
 
