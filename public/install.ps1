@@ -20,4 +20,4 @@ if (Test-Path $target) {
 }
 
 Write-Host "--> Launching full installer..."
-Start-Process -NoNewWindow -Wait cmd.exe -ArgumentList "/c install.bat"
+cmd /c .\install.bat
