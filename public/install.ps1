@@ -178,7 +178,7 @@ function Show-ModelPicker {
     $counter = 1
     foreach ($group in $provider.groups) {
         Write-Host ""
-        Write-Host "    $($box.H)$($box.H) $($group.name) $($box.H * (40 - $group.name.Length))" -ForegroundColor $c.Highlight
+        Write-Host "    $($box.H)$($box.H) $($group.name) $("$($box.H)" * (40 - $group.name.Length))" -ForegroundColor $c.Highlight
         foreach ($model in $group.models) {
             $allModels += $model
             $numStr = "{0,4}" -f $counter
@@ -222,9 +222,9 @@ Write-Host "    \:\  \        \/__/  \/__/   \:\~~\  " -ForegroundColor Blue
 Write-Host "     \:\__\                       \:\__\ " -ForegroundColor DarkBlue
 Write-Host "      \/__/                        \/__/ " -ForegroundColor DarkBlue
 Write-Host ""
-Write-Host "  $($box.H * 50)" -ForegroundColor $c.Muted
+Write-Host "  $("$($box.H)" * 50)" -ForegroundColor $c.Muted
 Write-Typed "  Your private, offline AI voice assistant." $c.Body 15
-Write-Host "  $($box.H * 50)" -ForegroundColor $c.Muted
+Write-Host "  $("$($box.H)" * 50)" -ForegroundColor $c.Muted
 Write-Host ""
 Start-Sleep -Milliseconds 400
 
@@ -626,13 +626,13 @@ $totalStr = "{0:N0}" -f $totalTime
 
 Write-Host ""
 Write-Host ""
-Write-Host "  $($box.TL)$($box.H * 52)$($box.TR)" -ForegroundColor $c.Success
+Write-Host "  $("$($box.TL)")$("$($box.H)" * 52)$("$($box.TR)")" -ForegroundColor $c.Success
 Write-Host "  $($box.V)                                                    $($box.V)" -ForegroundColor $c.Success
 Write-Host "  $($box.V)   " -NoNewline -ForegroundColor $c.Success
 Write-Host "Installation complete." -NoNewline -ForegroundColor Green
 Write-Host "                       $($box.V)" -ForegroundColor $c.Success
 Write-Host "  $($box.V)                                                    $($box.V)" -ForegroundColor $c.Success
-Write-Host "  $($box.BL)$($box.H * 52)$($box.BR)" -ForegroundColor $c.Success
+Write-Host "  $("$($box.BL)")$("$($box.H)" * 52)$("$($box.BR)")" -ForegroundColor $c.Success
 Write-Host ""
 
 $finalItems = @(
@@ -650,7 +650,7 @@ foreach ($item in $finalItems) {
 }
 
 Write-Host ""
-Write-Host "  $($box.H * 52)" -ForegroundColor $c.Muted
+Write-Host "  $("$($box.H)" * 52)" -ForegroundColor $c.Muted
 Write-Host ""
 Write-Host "    To launch Lumi:" -ForegroundColor $c.Heading
 Write-Host ""
