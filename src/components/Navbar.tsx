@@ -48,7 +48,7 @@ export default function Navbar() {
           <li><a href="#privacy" className="nav__link">Privacy</a></li>
         </ul>
 
-        <a href="#download" className="nav__cta">
+        <a href="https://github.com/atharvmantri/lumi-assist#install" target="_blank" rel="noopener noreferrer" className="nav__cta">
           Download
         </a>
       </div>
