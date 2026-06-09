@@ -102,7 +102,7 @@ export default function Tools() {
         >
           <span className="section-label">Tools & Integrations</span>
           <h2 className="section-title">
-            90+ tools. <span className="gradient-text">One voice.</span>
+            90+ tools. <span className="gradient-text">And growing</span>
           </h2>
           <p className="section-subtitle">
             From system commands to developer workflows, Lumi can
